@@ -106,12 +106,12 @@ class Svg_Plot_Gen
 		end
 
 		# Output some useful info about the plot we're generating to stderr
-		$stderr.puts ["X Origin       ", xstart].join
-		$stderr.puts ["Y Origin       ", yend].join
-		$stderr.puts ["X Length       ", xlen].join
-		$stderr.puts ["Y Length       ", ylen].join
-		$stderr.puts ["Px per second  ", (xlen.to_f/(24*3600)).round(6)].join
-		$stderr.puts ["Px per decade  ", (ylen.to_f/5).round(2)].join
+		$stderr.puts ["X Origin           ", xstart].join
+		$stderr.puts ["Y Origin           ", yend].join
+		$stderr.puts ["X Length           ", xlen].join
+		$stderr.puts ["Y Length           ", ylen].join
+		$stderr.puts ["Px per x division  ", (xlen.to_f/12).round(2)].join
+		$stderr.puts ["Px per y division  ", (ylen.to_f/(opts.y_last - opts.y_first)).round(2)].join
 
 		# Create the XML object
 		builder = Nokogiri::XML::Builder.new(:encoding => 'UTF-8') do |xml|
