@@ -12,6 +12,12 @@ class Svg_Plot_Gen
 			opt :template, "Output a template SVG file that contains [SPLIT] markers where a path and display attribute can be inserted. See README.md", :default => false
 			opt :width, "The width of the output plot in pixels", :default => 960
 			opt :height, "The height of the output plot in pixels", :default => 380
+			opt :y_first, "Sets the value at which the y axis starts", :default => 0
+			opt :y_last, "Set the value at which the y axis ends", :default => 5
+			opt :log, "Sets the y axis to a logarithmic scale. `y_first` and `y_last` now refer to powers of 10", :default => false
+			opt :x_text, "The x-axis label", :default => 'x-axis'
+			opt :y_text, "The y-axis label", :default => 'y-axis'
+			opt :cursor_line, "Adds a vertical line that follows the cursor to the graph", :default => false
 			opt :x_margin, "The distance that is left between the edge of the image and the x-axis", :default => 70
 			opt :y_margin, "The distance that is left between the edge of the image and the y-axis", :default => 100
 			opt :margins, "The distance that is left between the edge of the image and the plot on sides that do not have labels", :default => 25
@@ -19,9 +25,6 @@ class Svg_Plot_Gen
 			opt :short_tick_len, "The length of the short ticks on the graph", :default => 5
 			opt :font_size, "The size of font used for the plot", :default => 12
 			opt :label_font_size, "The size of font used for the axis labels", :default => 14
-			opt :scale, "The scale that is going to be used on the y axis", :default => 'em'
-			opt :x_text, "The x-axis label", :default => 'x-axis'
-			opt :y_text, "The y-axis label", :default => 'y-axis'
 		end
 
 		axis_padding = 6
@@ -55,10 +58,12 @@ class Svg_Plot_Gen
 		# Read in the CSS for our font
 		font_css = File.read(File.dirname(__FILE__) + '/font.css')
 
-		# Load in the javascript for the cursor line script
-		cursor_line_js = File.read(File.dirname(__FILE__) + '/cursor_line.js')
-		# Replace the [XSTART] and [XEND] placeholders in the javascript
-		cursor_line_js = cursor_line_js.gsub(/\[XSTART\]/, xstart.to_s).gsub(/\[XEND\]/, xend.to_s)
+		if opts.cursor_line
+			# Load in the javascript for the cursor line script
+			cursor_line_js = File.read(File.dirname(__FILE__) + '/cursor_line.js')
+			# Replace the [XSTART] and [XEND] placeholders in the javascript
+			cursor_line_js = cursor_line_js.gsub(/\[XSTART\]/, xstart.to_s).gsub(/\[XEND\]/, xend.to_s)
+		end
 
 		# Set the template marker if specified
 		if opts.template
@@ -77,18 +82,27 @@ class Svg_Plot_Gen
 		xlabels = (0..24).step(2).map { |hour| [['00', (hour%24).to_s].join[-2..-1], ':00'].join }.zip(xlines.select { |k, v| v }.map { |k, v| k })
 
 		# Generates the values for a logarithmic scale
-		if opts.scale == 'em'
+		if opts.log
 			# Work out the y-positions of the horizonal lines and ticks
-			ylines = Hash[(0..5).map { |y| (y < 5 ? [1, 2.5, 5, 7.5] : [1]).map { |m| [Math.log10((10**y)*m), m==1] } }.flatten(1).map { |y| [(yend - y[0]*(ylen.to_f/5)).round(1), y[1]] }]
+			ylines = Hash[(opts.y_first..opts.y_last)
+				.map { |y| (y < opts.y_last ? [1, 2.5, 5, 7.5] : [1])
+					.map { |m| [Math.log10((10**y)*m), m==1] } }
+				.flatten(1)
+				.map { |y| [(yend - (y[0] - opts.y_first)*(ylen.to_f/(opts.y_last - opts.y_first))).round(1), y[1]] }]
 			# Build up our y-axis labels
-			ylabels = ['1000', '10000', '100000', '1e+06', '1e+07', '1e+08'].zip(ylines.select { |k ,v| v }.map { |k, v| k })
-		end
-		# Generate the values for a linear scale
-		if opts.scale == 'battery'
+			ylabels = (opts.y_first..opts.y_last)
+				.map{ |i| 10**i }
+				.map{ |i| i <= 10000 ? ("%d" % i) : ("%.0e" % i) }
+				.zip(ylines.select { |k ,v| v }.map { |k, v| k })
+		else # Generate the values for a linear scale
 			# Work out the y-positions of the horizonal lines and ticks
-			ylines = Hash[(0..5).map { |y| (y < 5 ? [0, 0.25, 0.5, 0.75] : [0]).map { |m| [y+m, m==0] } }.flatten(1).map { |y| [(yend - y[0]*(ylen.to_f/5)).round(1), y[1]] }]
+			ylines = Hash[(opts.y_first..opts.y_last)
+				.map { |y| (y < opts.y_last ? [0, 0.25, 0.5, 0.75] : [0])
+					.map { |m| [y+m, m==0] } }
+				.flatten(1)
+				.map { |y| [(yend - (y[0] - opts.y_first)*(ylen.to_f/(opts.y_last - opts.y_first))).round(1), y[1]] }]
 			# Build up our y-axis labels
-			ylabels = (0..5).zip(ylines.select { |k ,v| v }.map { |k, v| k })
+			ylabels = (opts.y_first..opts.y_last).zip(ylines.select { |k ,v| v }.map { |k, v| k })
 		end
 
 		# Output some useful info about the plot we're generating to stderr
@@ -119,16 +133,18 @@ class Svg_Plot_Gen
 						xml.cdata(font_css)
 					end
 				end
-				# Cursor Line Script
-				xml.script(:type => 'text/javascript') do
-					xml.cdata(cursor_line_js)
+				if opts.cursor_line
+					# Cursor Line Script
+					xml.script(:type => 'text/javascript') do
+						xml.cdata(cursor_line_js)
+					end
+					# The cursor line itself
+					xml.path(:id => 'cursor_line',
+						:d => ['M0,', ystart, 'l0,', ylen].join,
+						:stroke => orange.html,
+						'stroke-width' => '1.5',
+						:display => 'none')
 				end
-				# The cursor line itself
-				xml.path(:id => 'cursor_line',
-					:d => ['M0,', ystart, 'l0,', ylen].join,
-					:stroke => orange.html,
-					'stroke-width' => '1.5',
-					:display => 'none')
 				# X-Axis - Vertical Lines
 				xml.g(:style => "color:grey",
 					:stroke => "currentColor",
