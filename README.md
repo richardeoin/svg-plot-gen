@@ -10,7 +10,7 @@ When you've got the same format of graph that you just want to plot over and ove
 Maybe you're working on an embedded system, have a bash script that for some reason can't use [gnuplot](http://www.gnuplot.info/) or you're trying to make a
 [CouchDB](http://couchdb.apache.org/) [list function](http://wiki.apache.org/couchdb/Formatting_with_Show_and_List) output an SVG graph.
 
-Another rationale for using it is that you don't want to waste processing power generating axes and gridlines every time you what to output a graph.
+Another rationale for using this is that you don't want to waste processing power generating axes and gridlines every time you want to output a graph.
 
 ## Installation
 
@@ -26,7 +26,11 @@ to get all the required gems.
 
 ## What it does
 
-It creates an SVG file that look somewhat like this:
+It outputs an SVG file that looks somewhat like this:
+
+![alt text](example.svg "An example output")
+
+to stdout.
 
 **That's all.**
 
