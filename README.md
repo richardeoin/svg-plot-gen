@@ -35,7 +35,7 @@ It outputs an SVG file that looks somewhat like [this](example.svg) to stdout.
 Run
 
 ```
-ruby gen.rb --help
+ruby svg_plot_gen.rb --help
 ```
 
 to see details of all the command line options.
