@@ -40,6 +40,17 @@ ruby gen.rb --help
 
 to see details of all the command line options.
 
+## Templates
+
+Specifing the `-t` option means the output will contain two `[SPLIT]` tags that can be replaced with data by a stream editor like `sed` or whatever string manipulation functions exist
+in your language.
+
+The first `[SPLIT]` tag is for a line graph. If a path is substituted in using the format specified [here](https://developer.mozilla.org/docs/SVG/Attribute/d) then this will be
+overlayed on the graph.
+
+The second `[SPLIT]` tag is in the [display](https://developer.mozilla.org/docs/SVG/Attribute/display) attribute of a 'No Data Found' marker, and can be substituted for `inline`
+to display this marker.
+
 ## License ##
 
 MIT

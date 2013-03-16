@@ -10,7 +10,7 @@ require 'trollop'
 
 # Command line options
 opts = Trollop::options do
-	opt :template, "Output a template SVG file without an example plot", :default => false
+	opt :template, "Output a template SVG file that contains [SPLIT] markers where a path and display attribute can be inserted. See README.md", :default => false
 	opt :width, "The width of the output plot in pixels", :default => 960
 	opt :height, "The height of the output plot in pixels", :default => 380
 	opt :x_margin, "The distance that is left between the edge of the image and the x-axis", :default => 70
@@ -225,6 +225,7 @@ builder = Nokogiri::XML::Builder.new(:encoding => 'UTF-8') do |xml|
 				xml.path(:stroke => red.html, :d => plot)
 			end
 		end
+		# No data marker
 		xml.g(:style => 'text-anchor:middle',
 			:stroke => red.html,
 			:transform => ['translate(', xstart + xlen/2, ',', ystart + ylen/2, ')'].join,
