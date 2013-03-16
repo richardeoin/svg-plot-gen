@@ -237,7 +237,7 @@ builder = Nokogiri::XML::Builder.new(:encoding => 'UTF-8') do |xml|
 
 			xml.text_ 'No Data Found'
 		end
-		# An invisible rectangle
+		# An invisible rectangle to stop the final graph being highlighted and so on
 		xml.rect(:x => 0, :y => 0,
 			:width => opts.width,
 			:height => opts.height,
