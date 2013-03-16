@@ -44,7 +44,7 @@ Specifing the `-t` option means the output will contain two `[SPLIT]` tags that 
 in your language.
 
 The first `[SPLIT]` tag is for a line graph. If a path is substituted in using the format specified [here](https://developer.mozilla.org/docs/SVG/Attribute/d) then this will be
-overlayed on the graph.
+overlayed on the graph. The path is transformed to be relative to the origin of the axes and so that up is positive.
 
 The second `[SPLIT]` tag is in the [display](https://developer.mozilla.org/docs/SVG/Attribute/display) attribute of a 'No Data Found' marker, and can be substituted for `inline`
 to display this marker.
