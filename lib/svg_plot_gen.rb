@@ -233,11 +233,14 @@ class Svg_Plot_Gen
 					xml.path(:d => ['m', xstart, ' ', ystart, 'v', ylen, 'h', xlen, 'v', -ylen , 'h', -xlen, 'z'].join)
 				end
 				# Plots
-				xml.a('xlink:title' => 'Plot #1') do
-					xml.g('stroke-width' => 1.4,
-						'stroke-linejoin' => 'bevel',
-						:fill => 'none') do
-						xml.path(:stroke => red.html, :d => plot)
+				#xml.g(:transform => ['translate(', xstart, ',', yend, ') scale(', 1000.to_f/xlen, ',', -(1000.to_f/ylen), ')'].join) do
+				xml.g(:transform => ['translate(', xstart, ',', yend, ') scale(1, -1)'].join) do
+					xml.a('xlink:title' => 'Plot #1') do
+						xml.g('stroke-width' => 1.4,
+							'stroke-linejoin' => 'bevel',
+							:fill => 'none') do
+							xml.path(:stroke => red.html, :d => plot)
+						end
 					end
 				end
 				# No data marker
