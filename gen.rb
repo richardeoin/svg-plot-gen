@@ -21,6 +21,8 @@ opts = Trollop::options do
 	opt :font_size, "The size of font used for the plot", :default => 12
 	opt :label_font_size, "The size of font used for the axis labels", :default => 14
 	opt :scale, "The scale that is going to be used on the y axis", :default => 'em'
+	opt :x_text, "The x-axis label", :default => 'x-axis'
+	opt :y_text, "The y-axis label", :default => 'y-axis'
 end
 
 axis_padding = 6
@@ -59,15 +61,14 @@ cursor_line_js = File.read(File.dirname($0) + '/' + 'cursor_line.js')
 # Replace the [XSTART] and [XEND] placeholders in the javascript
 cursor_line_js = cursor_line_js.gsub(/\[XSTART\]/, xstart.to_s).gsub(/\[XEND\]/, xend.to_s)
 
-# Work out what we're actually going to plot
-if !opts.template
-	# Load in the example plot
-	plot = File.read(File.dirname($0) + '/' + 'path_example.dat')
-	no_data_display = 'none'
-else
+# Set the template marker if specified
+if opts.template
 	# Put in a split marker when the data actully goes
-	plot = "[SPLIT]"
-	no_data_display = "[SPLIT]"
+	plot = '[SPLIT]'
+	no_data_display = '[SPLIT]'
+else
+	plot = ''
+	no_data_display = 'none'
 end
 
 # Work out the x-positions of our vertical lines and ticks
@@ -82,8 +83,6 @@ if opts.scale == 'em'
 	ylines = Hash[(0..5).map { |y| (y < 5 ? [1, 2.5, 5, 7.5] : [1]).map { |m| [Math.log10((10**y)*m), m==1] } }.flatten(1).map { |y| [(yend - y[0]*(ylen.to_f/5)).round(1), y[1]] }]
 	# Build up our y-axis labels
 	ylabels = ['1000', '10000', '100000', '1e+06', '1e+07', '1e+08'].zip(ylines.select { |k ,v| v }.map { |k, v| k })
-	# Set the text label
-	y_text = 'Received Signal Strength'
 end
 # Generate the values for a linear scale
 if opts.scale == 'battery'
@@ -91,8 +90,6 @@ if opts.scale == 'battery'
 	ylines = Hash[(0..5).map { |y| (y < 5 ? [0, 0.25, 0.5, 0.75] : [0]).map { |m| [y+m, m==0] } }.flatten(1).map { |y| [(yend - y[0]*(ylen.to_f/5)).round(1), y[1]] }]
 	# Build up our y-axis labels
 	ylabels = (0..5).zip(ylines.select { |k ,v| v }.map { |k, v| k })
-	# Set the text label
-	y_text = 'Battery Voltage (V)'
 end
 
 # Output some useful info about the plot we're generating to stderr
@@ -171,7 +168,7 @@ builder = Nokogiri::XML::Builder.new(:encoding => 'UTF-8') do |xml|
 			'font-size' => [opts.label_font_size, 'pt'].join,
 			:fill => '#000') do
 
-			xml.text_ 'Time'
+			xml.text_ opts.x_text
 		end
 		# Y-Axis - Horizontal Lines
 		xml.g(:style => "color:grey",
@@ -213,7 +210,7 @@ builder = Nokogiri::XML::Builder.new(:encoding => 'UTF-8') do |xml|
 			'font-size' => [opts.label_font_size, 'pt'].join,
 			:fill => '#000') do
 
-		   	xml.text_ y_text
+		   	xml.text_ opts.y_text
 		end
 		# Bounding Box
 		xml.g(:stroke => "#333",
