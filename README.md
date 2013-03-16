@@ -16,13 +16,11 @@ Another rationale for using this is that you don't want to waste processing powe
 
 **svg-plot-gen** is written in [ruby](http://www.ruby-lang.org/) and uses [nokogiri](http://nokogiri.org/) to output SVG.
 
-You'll need to install [ruby](http://www.ruby-lang.org/) and [bundler](http://gembundler.com/) if you haven't already got them installed. Then is should just be a case of running
+You'll need to install [ruby](http://www.ruby-lang.org/) and [ruby gems](http://rubygems.org/) if you haven't already got them installed. Then it should just be a case of running
 
 ```
-bundle install
+gem install svg_plot_gen
 ```
-
-to get all the required gems.
 
 ## What it does
 
@@ -35,7 +33,7 @@ It outputs an SVG file that looks somewhat like [this](example.svg) to stdout.
 Run
 
 ```
-ruby svg_plot_gen.rb --help
+svg_plot_gen --help
 ```
 
 to see details of all the command line options.
