@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+begin
+	require 'svg_plot_gen'
+rescue LoadError
+	require 'rubygems'
+	require 'svg_plot_gen'
+end
+
+Svg_Plot_Gen.gen()
