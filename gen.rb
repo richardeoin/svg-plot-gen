@@ -1,5 +1,9 @@
 # Richard Meadows 2013
 # Generates the SVG for a graph
+
+require 'rubygems'
+require 'bundler/setup'
+
 require 'nokogiri'
 require 'color'
 require 'trollop'

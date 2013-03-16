@@ -12,6 +12,18 @@ Maybe you're working on an embedded system, have a bash script that for some rea
 
 Another rationale for using it is that you don't want to waste processing power generating axes and gridlines every time you what to output a graph.
 
+## Installation
+
+**svg-plot-gen** is written in [ruby](http://www.ruby-lang.org/) and uses [nokogiri](http://nokogiri.org/) to output SVG.
+
+You'll need to install [ruby](http://www.ruby-lang.org/) and [bundler](http://gembundler.com/) if you haven't already got them installed. Then is should just be a case of running
+
+```
+bundle install
+```
+
+to get all the required gems.
+
 ## What it does
 
 It creates an SVG file that look somewhat like this:
