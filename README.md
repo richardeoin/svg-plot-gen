@@ -30,7 +30,15 @@ It outputs an SVG file that looks somewhat like [this](example.svg) to stdout.
 
 **That's all.**
 
-## An example
+## Usage ##
+
+Run
+
+```
+ruby gen.rb --help
+```
+
+to see details of all the command line options.
 
 ## License ##
 
