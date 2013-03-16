@@ -26,11 +26,7 @@ to get all the required gems.
 
 ## What it does
 
-It outputs an SVG file that looks somewhat like this:
-
-![alt text](example.svg "An example output")
-
-to stdout.
+It outputs an SVG file that looks somewhat like [this](example.svg) to stdout.
 
 **That's all.**
 
