@@ -12,8 +12,9 @@ class Svg_Plot_Gen
 			opt :template, "Output a template SVG file that contains [SPLIT] markers where a path and display attribute can be inserted. See README.md", :default => false
 			opt :width, "The width of the output plot in pixels", :default => 960
 			opt :height, "The height of the output plot in pixels", :default => 380
-			opt :y_first, "Sets the value at which the y axis starts", :default => 0
-			opt :y_last, "Set the value at which the y axis ends", :default => 5
+			opt :y_first, "Sets the value at which the y axis starts", :default => 0.to_f
+			opt :y_step, "Sets the height of each division on the y axis", :default => 1.to_f
+			opt :y_last, "Sets the value at which the y axis ends", :default => 5.to_f
 			opt :log, "Sets the y axis to a logarithmic scale. `y_first` and `y_last` now refer to powers of 10", :default => false
 			opt :x_text, "The x-axis label", :default => 'x-axis'
 			opt :y_text, "The y-axis label", :default => 'y-axis'
@@ -81,28 +82,39 @@ class Svg_Plot_Gen
 		# Build up our x-axis labels for a 24 hour period
 		xlabels = (0..24).step(2).map { |hour| [['00', (hour%24).to_s].join[-2..-1], ':00'].join }.zip(xlines.select { |k, v| v }.map { |k, v| k })
 
+		y_range = (opts.y_first..opts.y_last).step(opts.y_step)
+
 		# Generates the values for a logarithmic scale
 		if opts.log
 			# Work out the y-positions of the horizonal lines and ticks
-			ylines = Hash[(opts.y_first..opts.y_last)
-				.map { |y| (y < opts.y_last ? [1, 2.5, 5, 7.5] : [1])
+			ylines = Hash[y_range
+				.map { |y| (y < opts.y_last ?
+						[1, 2.5, 5, 7.5].map { |i| i*opts.y_step } :
+						[1])
 					.map { |m| [Math.log10((10**y)*m), m==1] } }
 				.flatten(1)
 				.map { |y| [(yend - (y[0] - opts.y_first)*(ylen.to_f/(opts.y_last - opts.y_first))).round(1), y[1]] }]
 			# Build up our y-axis labels
-			ylabels = (opts.y_first..opts.y_last)
+			ylabels = y_range
 				.map{ |i| 10**i }
 				.map{ |i| i <= 10000 ? ("%d" % i) : ("%.0e" % i) }
-				.zip(ylines.select { |k ,v| v }.map { |k, v| k })
+				.zip(ylines
+					.select { |k ,v| v } # Select only major ticks
+					.map { |k, v| k })
 		else # Generate the values for a linear scale
 			# Work out the y-positions of the horizonal lines and ticks
-			ylines = Hash[(opts.y_first..opts.y_last)
-				.map { |y| (y < opts.y_last ? [0, 0.25, 0.5, 0.75] : [0])
+			ylines = Hash[y_range
+				.map { |y| (y < opts.y_last ?
+						[0, 0.25, 0.5, 0.75].map { |i| i*opts.y_step } :
+						[0])
 					.map { |m| [y+m, m==0] } }
 				.flatten(1)
 				.map { |y| [(yend - (y[0] - opts.y_first)*(ylen.to_f/(opts.y_last - opts.y_first))).round(1), y[1]] }]
 			# Build up our y-axis labels
-			ylabels = (opts.y_first..opts.y_last).zip(ylines.select { |k ,v| v }.map { |k, v| k })
+			ylabels = y_range
+				.zip(ylines
+					.select { |k, v| v } # Select only major ticks
+					.map { |k, v| k })
 		end
 
 		# Output some useful info about the plot we're generating to stderr

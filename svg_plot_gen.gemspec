@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
 	s.name          = "svg_plot_gen"
 	s.summary       = "Creates the axes and gridlines for a graph in SVG. Perfect for creating a static background to which live data can be added."
-	s.version       = "1.0.0"
+	s.version       = "1.1.0"
 	s.date          = Time.now.strftime('%Y-%m-%d')
 	s.author        = "Richard Meadows"
 	s.homepage      = "https://github.com/richardeoin/svg-plot-gen"
