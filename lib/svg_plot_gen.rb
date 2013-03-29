@@ -5,6 +5,13 @@ require 'nokogiri'
 require 'color'
 require 'trollop'
 
+# A little overload for float that turns whole number floats (like 5.0) into integers.
+class Float
+	def whole_to_i
+		to_i == self ? to_i : self
+	end
+end
+
 class Svg_Plot_Gen
 	def self.gen
 		# Command line options
@@ -112,6 +119,7 @@ class Svg_Plot_Gen
 				.map { |y| [(yend - (y[0] - opts.y_first)*(ylen.to_f/(opts.y_last - opts.y_first))).round(1), y[1]] }]
 			# Build up our y-axis labels
 			ylabels = y_range
+				.map{ |i| i.whole_to_i }
 				.zip(ylines
 					.select { |k, v| v } # Select only major ticks
 					.map { |k, v| k })
